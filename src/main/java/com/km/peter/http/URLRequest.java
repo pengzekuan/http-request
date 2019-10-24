@@ -28,14 +28,11 @@ public class URLRequest extends CommonRequest {
         try {
             connection = clz.cast(url.openConnection());
 
-            // 设置请求方法
             clz.getMethod("setRequestMethod", String.class).invoke(connection, method);
 
-            // 设置超时
             clz.getMethod("setConnectTimeout", int.class).invoke(connection, URLRequest.CONNECTION_TIMEOUT);
             clz.getMethod("setReadTimeout", int.class).invoke(connection, URLRequest.READ_TIMEOUT);
 
-            // 设置请求头
             if (headers != null && headers.size() > 0) {
                 for (String key : headers.keySet()) {
                     clz.getMethod("setRequestProperty", String.class, String.class)
@@ -43,16 +40,13 @@ public class URLRequest extends CommonRequest {
                 }
             }
 
-            // 请求参数
             clz.getMethod("setDoInput", boolean.class).invoke(connection, true);
             clz.getMethod("setDoOutput", boolean.class).invoke(connection, true);
 
             clz.getMethod("setUseCaches", boolean.class).invoke(connection, false);
 
-            // 连接资源
             clz.getMethod("connect").invoke(connection);
 
-            // 传递参数
             if (params != null) {
                 out = (OutputStream) clz.getMethod("getOutputStream").invoke(connection);
                 writer = new OutputStreamWriter(out);
