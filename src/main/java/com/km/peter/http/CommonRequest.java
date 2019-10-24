@@ -8,9 +8,9 @@ import java.util.Map;
 
 abstract class CommonRequest implements Request {
 
-    static final int CONNECTION_TIMEOUT = 3000;
+    static final int CONNECTION_TIMEOUT = 10000;
 
-    static final int READ_TIMEOUT = 6000;
+    static final int READ_TIMEOUT = 30000;
 
     static final ContentType CONTENT_TYPE = ContentType.JSON;
 
@@ -36,12 +36,12 @@ abstract class CommonRequest implements Request {
     @Override
     public Response get(String uri, Map<String, Object> query) {
 
-        return this.request(uri, RequestMethod.GET, query);
+        return this.request(uri, RequestMethod.GET, query, null);
     }
 
     @Override
     public Response get(String uri) {
-        return this.request(uri, RequestMethod.GET, null);
+        return this.request(uri, RequestMethod.GET, null, null);
     }
 
     @Override
@@ -50,8 +50,18 @@ abstract class CommonRequest implements Request {
     }
 
     @Override
-    public Object post() {
-        return null;
+    public Response post(String uri) {
+        return this.request(uri, RequestMethod.POST, null, null);
+    }
+
+    @Override
+    public Response post(String uri, Map<String, Object> query) {
+        return this.request(uri, RequestMethod.POST, query, null);
+    }
+
+    @Override
+    public Response post(String uri, Map<String, Object> query, Object params) {
+        return this.request(uri, RequestMethod.POST, query, params);
     }
 
     @Override
@@ -90,7 +100,7 @@ abstract class CommonRequest implements Request {
     }
 
     @Override
-    public Response request(String uri, String method, Map<String, Object> query) {
+    public Response request(String uri, String method, Map<String, Object> query, Object params) {
         return null;
     }
 

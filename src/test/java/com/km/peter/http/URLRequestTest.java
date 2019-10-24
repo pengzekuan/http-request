@@ -16,7 +16,7 @@ public class URLRequestTest {
     @Test
     public void testRequest() throws JsonProcessingException {
         Request request = new URLRequest();
-        Object res = request.request("http://www.baidu.com", RequestMethod.GET, null);
+        Object res = request.request("http://www.baidu.com", RequestMethod.GET, null, null);
         System.out.println(new ObjectMapper().writeValueAsString(res));
     }
 
@@ -65,5 +65,31 @@ public class URLRequestTest {
     @Test
     public void testGetWithHeader() {
 
+    }
+
+    @Test
+    public void testPost() throws JsonProcessingException {
+        Request request = new URLRequest();
+        Response res = request.post("https://api.weixin.qq.com/cgi-bin/tags/create?access_token=ACCESS_TOKEN");
+        System.out.println(new ObjectMapper().writeValueAsString(res));
+        System.out.println(res.getData());
+
+        Request request1 = new URLRequest();
+        Map<String, Object> query = new HashMap<>();
+        query.put("access_token", "ACCESS_TOKEN");
+        Response res1 = request1.post("https://api.weixin.qq.com/cgi-bin/tags/create", query);
+        System.out.println(new ObjectMapper().writeValueAsString(res1));
+        System.out.println(res1.getData());
+
+        Request request2 = new URLRequest();
+        Map<String, Object> params = new HashMap<>();
+        Map<String, String> child = new HashMap<>();
+        child.put("name", "发文发问发我");
+        params.put("tag", child);
+        System.out.println("发我发我");
+        System.out.println(new ObjectMapper().writeValueAsString(params));
+        Response res2 = request2.post("https://api.weixin.qq.com/cgi-bin/tags/create", query, params);
+        System.out.println(new ObjectMapper().writeValueAsString(res2));
+        System.out.println(res2.getData());
     }
 }

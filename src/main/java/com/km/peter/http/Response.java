@@ -11,6 +11,7 @@ public class Response {
     private String message;
 
     private byte[] bytes;
+    private String data;
 
     public Response() {
     }
@@ -22,7 +23,11 @@ public class Response {
 
     public String getData() {
 
-        return new String(this.bytes, StandardCharsets.UTF_8);
+        return this.data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
     }
 
     public byte[] getBytes() {
@@ -30,7 +35,9 @@ public class Response {
     }
 
     public void setBytes(byte[] bytes) {
+
         this.bytes = bytes;
+        this.data = new String(this.bytes, StandardCharsets.UTF_8);
     }
 
     public String getContentType() {

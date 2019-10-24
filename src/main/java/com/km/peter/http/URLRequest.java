@@ -1,24 +1,29 @@
 package com.km.peter.http;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import javax.net.ssl.HttpsURLConnection;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
+import java.util.Objects;
 
 public class URLRequest extends CommonRequest {
 
-    public <T> Response request(Class<T> clz, URL url, String method) {
+    public <T> Response request(Class<T> clz, URL url, String method, Object params) {
 
         T connection = null;
 
         InputStream inputStream = null;
 
         ByteArrayOutputStream outputStream = null;
+
+        OutputStreamWriter writer = null;
+
+        OutputStream out = null;
 
         try {
             connection = clz.cast(url.openConnection());
@@ -38,6 +43,17 @@ public class URLRequest extends CommonRequest {
             clz.getMethod("setDoOutput", boolean.class).invoke(connection, true);
 
             clz.getMethod("setUseCaches", boolean.class).invoke(connection, false);
+
+            // 连接资源
+            clz.getMethod("connect").invoke(connection);
+
+            // 传递参数
+            if (params != null) {
+                out = (OutputStream) clz.getMethod("getOutputStream").invoke(connection);
+                writer = new OutputStreamWriter(out);
+                writer.write(new ObjectMapper().writeValueAsString(params));
+                writer.flush();
+            }
 
             Response response = new Response();
 
@@ -87,13 +103,21 @@ public class URLRequest extends CommonRequest {
             e.printStackTrace();
         } finally {
             try {
-                assert connection != null;
-                clz.getMethod("disconnect").invoke(connection);
+                if (connection != null) {
 
-                assert inputStream != null;
-                inputStream.close();
-                assert outputStream != null;
-                outputStream.close();
+                    clz.getMethod("disconnect").invoke(connection);
+                }
+
+                Objects.requireNonNull(inputStream).close();
+                Objects.requireNonNull(outputStream).close();
+
+                if (writer != null) {
+                    writer.close();
+                }
+
+                if (out != null) {
+                    out.close();
+                }
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             } catch (InvocationTargetException e) {
@@ -107,19 +131,18 @@ public class URLRequest extends CommonRequest {
         return null;
     }
 
-    public Response httpRequest(URL url, String method) {
+    public Response httpRequest(URL url, String method, Object params) {
 
-        return this.request(HttpURLConnection.class, url, method);
+        return this.request(HttpURLConnection.class, url, method, params);
     }
 
-    public Response httpsRequest(URL url, String method) {
+    public Response httpsRequest(URL url, String method, Object params) {
 
-        return this.request(HttpsURLConnection.class, url, method);
+        return this.request(HttpsURLConnection.class, url, method, params);
     }
 
     @Override
-    public Response request(String uri, String method, Map<String, Object> query) {
-
+    public Response request(String uri, String method, Map<String, Object> query, Object params) {
         try {
             if (query != null && query.size() > 0) {
                 uri += "?" + queryBuild(query);
@@ -128,8 +151,8 @@ public class URLRequest extends CommonRequest {
             System.out.println("query:" + url.getQuery());
             String protocol = url.getProtocol();
             String methodName = protocol + "Request";
-            return (Response) this.getClass().getMethod(methodName, URL.class, String.class)
-                    .invoke(this.getClass().newInstance(), url, method);
+            return (Response) this.getClass().getMethod(methodName, URL.class, String.class, Object.class)
+                    .invoke(this.getClass().newInstance(), url, method, params);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {

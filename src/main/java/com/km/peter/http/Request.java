@@ -10,7 +10,11 @@ public interface Request {
 
     Response get(String uri, Map<String, String> header, Map<String, Object> query);
 
-    Object post();
+    Response post(String uri);
+
+    Response post(String uri, Map<String, Object> query);
+
+    Response post(String uri, Map<String, Object> query, Object params);
 
     Object patch();
 
@@ -26,6 +30,6 @@ public interface Request {
 
     Object trace();
 
-    Response request(String uri, String method, Map<String, Object> query);
+    Response request(String uri, String method, Map<String, Object> query, Object params);
 
 }
