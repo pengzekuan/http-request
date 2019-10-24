@@ -36,32 +36,37 @@ abstract class CommonRequest implements Request {
     @Override
     public Response get(String uri, Map<String, Object> query) {
 
-        return this.request(uri, RequestMethod.GET, query, null);
+        return this.request(uri, RequestMethod.GET, query, null, null);
     }
 
     @Override
     public Response get(String uri) {
-        return this.request(uri, RequestMethod.GET, null, null);
+        return this.request(uri, RequestMethod.GET, null, null, null);
     }
 
     @Override
-    public Response get(String uri, Map<String, String> header, Map<String, Object> query) {
+    public Response get(String uri, Map<String, Object> query, Map<String, String> header) {
+        return null;
+    }
+
+    @Override
+    public Response post(String uri, Map<String, Object> query, Object params, Map<String, String> header) {
         return null;
     }
 
     @Override
     public Response post(String uri) {
-        return this.request(uri, RequestMethod.POST, null, null);
+        return this.request(uri, RequestMethod.POST, null, null, null);
     }
 
     @Override
     public Response post(String uri, Map<String, Object> query) {
-        return this.request(uri, RequestMethod.POST, query, null);
+        return this.request(uri, RequestMethod.POST, query, null, null);
     }
 
     @Override
     public Response post(String uri, Map<String, Object> query, Object params) {
-        return this.request(uri, RequestMethod.POST, query, params);
+        return this.request(uri, RequestMethod.POST, query, params, null);
     }
 
     @Override
@@ -100,7 +105,7 @@ abstract class CommonRequest implements Request {
     }
 
     @Override
-    public Response request(String uri, String method, Map<String, Object> query, Object params) {
+    public Response request(String uri, String method, Map<String, Object> query, Object params, Map<String, String> headers) {
         return null;
     }
 

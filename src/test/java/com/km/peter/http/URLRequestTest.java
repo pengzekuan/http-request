@@ -4,7 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -14,14 +17,28 @@ public class URLRequestTest {
     private static final String TEST_STORAGE = "D:\\test";
 
     @Test
+    public void testRequestFactory() throws IllegalAccessException, InstantiationException, JsonProcessingException {
+        Class clz = URLRequest.class;
+        Request request = (Request) clz.newInstance();
+        Response response = request.get("http://www.baidu.com");
+        System.out.println(new ObjectMapper().writeValueAsString(response));
+        System.out.println(response.getData());
+
+        Request request1 = RequestFactory.instance(URLRequest.class);
+        Response response1 = request1.get("http://www.baidu.com");
+        System.out.println(new ObjectMapper().writeValueAsString(response1));
+        System.out.println(response1.getData());
+    }
+
+    @Test
     public void testRequest() throws JsonProcessingException {
         Request request = new URLRequest();
-        Object res = request.request("http://www.baidu.com", RequestMethod.GET, null, null);
+        Object res = request.request("http://www.baidu.com", RequestMethod.GET, null, null, null);
         System.out.println(new ObjectMapper().writeValueAsString(res));
     }
 
     @Test
-    public void testGet() throws JsonProcessingException, UnsupportedEncodingException {
+    public void testGet() throws JsonProcessingException {
         Request request = new URLRequest();
         Response res = request.get("https://www.baidu.com");
         System.out.println(new ObjectMapper().writeValueAsString(res));
@@ -84,9 +101,8 @@ public class URLRequestTest {
         Request request2 = new URLRequest();
         Map<String, Object> params = new HashMap<>();
         Map<String, String> child = new HashMap<>();
-        child.put("name", "发文发问发我");
+        child.put("name", "测试");
         params.put("tag", child);
-        System.out.println("发我发我");
         System.out.println(new ObjectMapper().writeValueAsString(params));
         Response res2 = request2.post("https://api.weixin.qq.com/cgi-bin/tags/create", query, params);
         System.out.println(new ObjectMapper().writeValueAsString(res2));

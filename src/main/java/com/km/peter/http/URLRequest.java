@@ -13,7 +13,7 @@ import java.util.Objects;
 
 public class URLRequest extends CommonRequest {
 
-    public <T> Response request(Class<T> clz, URL url, String method, Object params) {
+    private <T> Response reflactRequest(Class<T> clz, URL url, String method, Object params, Map<String, String> headers) {
 
         T connection = null;
 
@@ -36,7 +36,12 @@ public class URLRequest extends CommonRequest {
             clz.getMethod("setReadTimeout", int.class).invoke(connection, URLRequest.READ_TIMEOUT);
 
             // 设置请求头
-//            clz.getMethod("setRequestProperty", String.class, String.class).invoke(connection, "Content-Type", URLRequest.CONTENT_TYPE.getValue());
+            if (headers != null && headers.size() > 0) {
+                for (String key : headers.keySet()) {
+                    clz.getMethod("setRequestProperty", String.class, String.class)
+                            .invoke(connection, key, headers.get(key));
+                }
+            }
 
             // 请求参数
             clz.getMethod("setDoInput", boolean.class).invoke(connection, true);
@@ -93,14 +98,8 @@ public class URLRequest extends CommonRequest {
             }
 
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+        } catch (IOException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            System.err.println(e);
         } finally {
             try {
                 if (connection != null) {
@@ -118,31 +117,25 @@ public class URLRequest extends CommonRequest {
                 if (out != null) {
                     out.close();
                 }
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | IOException e) {
+                System.err.println(e);
             }
         }
         return null;
     }
 
-    public Response httpRequest(URL url, String method, Object params) {
+    private Response httpRequest(URL url, String method, Object params, Map<String, String> headers) {
 
-        return this.request(HttpURLConnection.class, url, method, params);
+        return this.reflactRequest(HttpURLConnection.class, url, method, params, headers);
     }
 
-    public Response httpsRequest(URL url, String method, Object params) {
+    private Response httpsRequest(URL url, String method, Object params, Map<String, String> headers) {
 
-        return this.request(HttpsURLConnection.class, url, method, params);
+        return this.reflactRequest(HttpsURLConnection.class, url, method, params, headers);
     }
 
     @Override
-    public Response request(String uri, String method, Map<String, Object> query, Object params) {
+    public Response request(String uri, String method, Map<String, Object> query, Object params, Map<String, String> headers) {
         try {
             if (query != null && query.size() > 0) {
                 uri += "?" + queryBuild(query);
@@ -151,18 +144,10 @@ public class URLRequest extends CommonRequest {
             System.out.println("query:" + url.getQuery());
             String protocol = url.getProtocol();
             String methodName = protocol + "Request";
-            return (Response) this.getClass().getMethod(methodName, URL.class, String.class, Object.class)
-                    .invoke(this.getClass().newInstance(), url, method, params);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
+            return (Response) this.getClass().getDeclaredMethod(methodName, URL.class, String.class, Object.class, Map.class)
+                    .invoke(this.getClass().newInstance(), url, method, params, headers);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | MalformedURLException | InstantiationException e) {
+            System.err.println(e);
         }
 
         return null;
