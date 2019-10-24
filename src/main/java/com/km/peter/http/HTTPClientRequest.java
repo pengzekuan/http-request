@@ -6,7 +6,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -20,6 +20,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public class HTTPClientRequest extends CommonRequest {
+
+    public HTTPClientRequest() {
+    }
 
     @Override
     public Response request(String uri, String method, Map<String, Object> query, Object params, Map<String, String> headers) {
@@ -40,10 +43,10 @@ public class HTTPClientRequest extends CommonRequest {
         return null;
     }
 
-    private Response execute(HttpRequestBase httpRequestMethod) {
+    private Response execute(HttpUriRequest httpUriRequest) {
 
-        System.out.println("requestMethod:" + httpRequestMethod.getMethod());
-        System.out.println("requestURI:" + httpRequestMethod.getURI());
+        System.out.println("requestMethod:" + httpUriRequest.getMethod());
+        System.out.println("requestURI:" + httpUriRequest.getURI());
 
         // 创建httpClient对象
         CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -75,33 +78,33 @@ public class HTTPClientRequest extends CommonRequest {
         };
 
         try {
-            return httpClient.execute(httpRequestMethod, responseHandler);
+            return httpClient.execute(httpUriRequest, responseHandler);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println(e);
         } finally {
             try {
                 httpClient.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println(e);
             }
         }
 
         return null;
     }
 
-    private <T> T setHeader(T requestMethod, Map<String, String> headers) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    private <T> T setHeader(T request, Map<String, String> headers) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
 
         if (headers == null || headers.size() == 0) {
-            return requestMethod;
+            return request;
         }
 
-        Method method = requestMethod.getClass().getMethod("setHeader", String.class, String.class);
+        Method method = request.getClass().getMethod("setHeader", String.class, String.class);
 
         for (String key : headers.keySet()) {
-            method.invoke(requestMethod, key, headers.get(key));
+            method.invoke(request, key, headers.get(key));
         }
 
-        return requestMethod;
+        return request;
     }
 
     public Response httpGet(String url, Object params, Map<String, String> headers) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {

@@ -11,6 +11,15 @@ repositories {
     mavenCentral()
 }
 
+jar {
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    manifest {
+        attributes("Implementation-Title": "Gradle")
+    }
+}
+
 dependencies {
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.10.0'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.0'

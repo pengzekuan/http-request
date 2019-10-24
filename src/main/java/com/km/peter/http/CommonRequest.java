@@ -7,14 +7,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 abstract class CommonRequest implements Request {
-
     static final int CONNECTION_TIMEOUT = 10000;
-
     static final int READ_TIMEOUT = 30000;
-
     static final ContentType CONTENT_TYPE = ContentType.JSON;
-
     static final Charset CHARSET = StandardCharsets.UTF_8;
+
+    public CommonRequest() {
+    }
 
     static String queryBuild(Map<String, Object> query) {
         if (query == null || query.size() == 0) {

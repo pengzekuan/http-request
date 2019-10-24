@@ -41,7 +41,7 @@ public class HTTPClientRequestTest {
     }
 
     @Test
-    public void testPost() throws InstantiationException, IllegalAccessException {
+    public void testPost() {
         Request request = RequestFactory.instance(HTTPClientRequest.class);
         Map<String, Object> query = new HashMap<>();
         query.put("access_token", "access_token");
