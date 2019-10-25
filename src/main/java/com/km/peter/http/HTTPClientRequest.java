@@ -2,6 +2,7 @@ package com.km.peter.http;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.km.peter.http.helper.StringHelper;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
@@ -28,7 +29,7 @@ public class HTTPClientRequest extends CommonRequest {
     public Response request(String uri, String method, Map<String, Object> query, Object params, Map<String, String> headers) {
 
         if (query != null && query.size() > 0) {
-            uri += "?" + HTTPClientRequest.queryBuild(query);
+            uri += "?" + StringHelper.queryBuild(query);
         }
 
         String methodName = "http" + method.substring(0, 1).toUpperCase() + method.substring(1).toLowerCase();

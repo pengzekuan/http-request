@@ -15,23 +15,6 @@ abstract class CommonRequest implements Request {
     public CommonRequest() {
     }
 
-    static String queryBuild(Map<String, Object> query) {
-        if (query == null || query.size() == 0) {
-            return "";
-        }
-        StringBuilder builder = new StringBuilder();
-        for (String key : query.keySet()) {
-            if (key != null && query.get(key) != null) {
-                builder.append(key)
-                        .append("=")
-                        .append(query.get(key))
-                        .append("&");
-            }
-        }
-        builder.deleteCharAt(builder.length() - 1);
-        return builder.toString();
-    }
-
     @Override
     public Response get(String uri, Map<String, Object> query) {
 

@@ -1,6 +1,7 @@
 package com.km.peter.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.km.peter.http.helper.StringHelper;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
@@ -132,7 +133,7 @@ public class URLRequest extends CommonRequest {
     public Response request(String uri, String method, Map<String, Object> query, Object params, Map<String, String> headers) {
         try {
             if (query != null && query.size() > 0) {
-                uri += "?" + queryBuild(query);
+                uri += "?" + StringHelper.queryBuild(query);
             }
             URL url = new URL(uri);
             System.out.println("query:" + url.getQuery());
