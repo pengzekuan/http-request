@@ -20,4 +20,10 @@ public class StringHelper {
         builder.deleteCharAt(builder.length() - 1);
         return builder.toString();
     }
+
+    public static String urlBuilder(String uri, String queryString) {
+        return queryString != null && queryString.length() > 0
+                ? uri + "?" + queryString
+                : uri;
+    }
 }

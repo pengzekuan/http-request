@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.km.peter.http.helper.StringHelper;
 import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -15,9 +17,11 @@ import org.apache.http.impl.client.HttpClients;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 
 public class HTTPClientRequest extends CommonRequest {
@@ -118,14 +122,27 @@ public class HTTPClientRequest extends CommonRequest {
         return this.execute(httpGet);
     }
 
-    public Response httpPost(String url, Object params, Map<String, String> headers) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, JsonProcessingException {
+    public Response httpPost(String url, Object params, Map<String, String> headers) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, JsonProcessingException, UnsupportedEncodingException {
         HttpPost httpPost = new HttpPost(url);
 
         // set headers
         httpPost = this.setHeader(httpPost, headers);
 
         // request with params
-        httpPost.setEntity(new StringEntity(new ObjectMapper().writeValueAsString(params), StandardCharsets.UTF_8));
+        StringEntity entity = new StringEntity(new ObjectMapper().writeValueAsString(params), StandardCharsets.UTF_8);
+
+        String contentType = headers.get("Content-Type");
+        if ("application/x-www-form-urlencoded".equals(contentType)) {
+            entity = new UrlEncodedFormEntity((List<NameValuePair>) params, StandardCharsets.UTF_8);
+        }
+
+        if ("application/xml".equals(contentType)) {
+            entity = new StringEntity(params.toString(), StandardCharsets.UTF_8);
+        }
+
+        httpPost.setEntity(entity);
+
+        httpPost.getFirstHeader("Content-Type");
 
         return this.execute(httpPost);
     }

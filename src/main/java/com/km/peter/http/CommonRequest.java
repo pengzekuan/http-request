@@ -33,7 +33,12 @@ abstract class CommonRequest implements Request {
 
     @Override
     public Response post(String uri, Map<String, Object> query, Object params, Map<String, String> header) {
-        return null;
+        return this.request(uri, RequestMethod.POST, query, params, header);
+    }
+
+    @Override
+    public Response post(String uri, Object params) {
+        return this.request(uri, RequestMethod.POST, null, params, null);
     }
 
     @Override

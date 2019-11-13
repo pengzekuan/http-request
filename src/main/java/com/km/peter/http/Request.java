@@ -14,6 +14,8 @@ public interface Request {
 
     Response post(String uri, Map<String, Object> query);
 
+    Response post(String uri, Object params);
+
     Response post(String uri, Map<String, Object> query, Object params);
 
     Response post(String uri, Map<String, Object> query, Object params, Map<String, String> header);
